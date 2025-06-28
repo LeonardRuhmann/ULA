@@ -6,10 +6,20 @@
 //Somador Baseado no livro Willian Stallings 10ed, capítulo 10, pag. 334
 static void somadorCompleto(uint8_t A, uint8_t B, uint8_t cin, uint8_t * s, uint8_t * cout){
    //Implemente o código aqui
+   *s = (~A & ~B & cin) | (~A & B & ~cin) | (A & B & cin) | (A & ~B & ~cin);
+   *cout = (A & B) | (A & cin) | (B & cin);
 }
 
 static void somador8bits(uint8_t * regA, uint8_t * regB, uint8_t * Cin, uint8_t * soma, uint8_t * Cout, uint8_t * overflow){
     //Implemente o código aqui
+    for (int i = 0; i <= 7; i++){
+        *Cin = *Cout;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~V / Vocês acham que é necessário eu passar como valor do ponteiro Cin?
+        somadorCompleto((*regA >> i) & 1, (*regB >> i) & 1, *Cin, soma, Cout);
+
+        *regA = (*soma) ? (*regA | (1 << i)) : (*regA & (~1 << i));
+    }  
+    *overflow = ((*Cin) ^ (*Cout));
 }
 
 static void complementador(uint8_t * A){
