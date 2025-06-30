@@ -14,7 +14,7 @@ static void somador8bits(uint8_t * regA, uint8_t * regB, uint8_t * Cin, uint8_t 
     //Implemente o código aqui
     for (int i = 0; i <= 7; i++){
         *Cin = *Cout;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~V / Vocês acham que é necessário eu passar como valor do ponteiro Cin?
+
         somadorCompleto((*regA >> i) & 1, (*regB >> i) & 1, *Cin, soma, Cout);
 
         *regA = (*soma) ? (*regA | (1 << i)) : (*regA & (~1 << i));
@@ -24,16 +24,36 @@ static void somador8bits(uint8_t * regA, uint8_t * regB, uint8_t * Cin, uint8_t 
 
 static void complementador(uint8_t * A){
     //Implemente o código aqui
+    *A = ~(*A);    
 }
 
 //Adição de A e B e grava resultado em A
 void ULA_ADD(int8_t * regA, int8_t * regB, int8_t * overflow){
     //Implemente o código aqui
+    uint8_t Temp_regA = (uint8_t)*regA;
+    uint8_t Temp_regB = (uint8_t) *regB;
+    uint8_t Carry_in = 0;
+    uint8_t Carry_out = 0;
+    uint8_t Soma = 0;
+
+    somador8bits(&Temp_regA, &Temp_regB, &Carry_in, &Soma, &Carry_out, overflow);
+
+    *regA = Temp_regA;
 }
 
 //Subtração de A e B e grava resultado em A
 void ULA_SUB(int8_t * regA, int8_t * regB, int8_t * overflow){
     //Implemente o código aqui
+    uint8_t Temp_regA = (uint8_t)*regA;
+    uint8_t Temp_regB = (uint8_t)*regB;
+    complementador(&Temp_regB);
+    uint8_t Carry_in = 0;
+    uint8_t Carry_out = 1;
+    uint8_t Soma = 0;
+
+    somador8bits(&Temp_regA, &Temp_regB, &Carry_in, &Soma, &Carry_out, overflow);
+
+    *regA = Temp_regA;
 }
 
 //Multiplicação de Q(8bits) com M(8bits) gera resultado de 16bits que está em A(8bits) e Q(8bits)
