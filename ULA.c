@@ -17,7 +17,7 @@ static void somador8bits(uint8_t * regA, uint8_t * regB, uint8_t * Cin, uint8_t 
 
         somadorCompleto((*regA >> i) & 1, (*regB >> i) & 1, *Cin, soma, Cout);
 
-        *regA = (*soma) ? (*regA | (1 << i)) : (*regA & (~1 << i));
+        *regA = (*soma) ? (*regA | (1 << i)) : (*regA & ~(1 << i));
     }  
     *overflow = ((*Cin) ^ (*Cout));
 }
