@@ -64,4 +64,54 @@ void ULA_MUL(int8_t * A, int8_t * Q, int8_t * M,  int8_t * overflow){
 //Divisão com sinal de Q(Dividendo de 8bits) por M(Divisor de 8bits) com Quociente em Q(8bits) e Resto em A(8bits)
 void ULA_DIV(int8_t * A, int8_t * Q, int8_t * M, int8_t * overflow){
     //Implemente o código aqui
+   
+   // Validação de casos especificos, onde deve haver overflow
+    if (*M == 0 || (*Q == -128 && *M == -1)) {
+        *overflow = 1;
+        *A = 0;
+        *Q = 0;
+        return;
+    }
+
+    // Guarda sinais originais
+    int sinal_de_Q = *Q < 0;
+    int sinal_de_M = *M < 0;
+    int sinal_do_quotiente = sinal_de_Q ^ sinal_de_M;
+
+    // Converte para valores absolutos
+    uint8_t abs_Q = sinal_de_Q ? -(*Q) : *Q;
+    uint8_t abs_M = sinal_de_M ? -(*M) : *M;
+
+    // Algoritmo de divisão
+    uint8_t temp_A = 0;
+    uint8_t temp_Q = abs_Q;
+
+    for (int i = 0; i < 8; i++) {
+        uint8_t bit_mais_significativo_de_Q = temp_Q & 0x80;
+        temp_A = (temp_A << 1) | (bit_mais_significativo_de_Q >> 7);
+        temp_Q <<= 1;
+
+        uint8_t original_A = temp_A;
+        temp_A -= abs_M;
+
+        if (temp_A & 0x80) {
+            //restaura para o valor antigo
+            temp_A = original_A;
+        } else {
+            //seta como bit menos significativo
+            temp_Q |= 1;
+        }
+    }
+
+    // Calcula resto e quociente
+    int8_t resto = (int8_t)temp_A;
+    int8_t quociente = (int8_t)temp_Q;
+
+    // Aplica sinais
+    if (sinal_de_Q) resto = -resto;  // Resto mesmo sinal do dividendo
+    if (sinal_do_quotiente) quociente = -quociente;
+
+    *A = resto;
+    *Q = quociente;
+    *overflow = 0;
 }
